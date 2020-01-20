@@ -10,6 +10,8 @@ import BNE from './instructions/BNE';
 import BPL from './instructions/BPL';
 import BVC from './instructions/BVC';
 import BVS from './instructions/BVS';
+import BIT from './instructions/BIT';
+import BRK from './instructions/BRK';
 
 export enum AddressMode {
     ACCUMULATOR, // Operand is A
@@ -121,7 +123,7 @@ const createInstruction = (
             const operand = getOperand(state, addressMode);
     
             const result = fn(state, operand, (value: number) => setOperand(state, addressMode, value));
-            result.PC += bytes;
+            if (bytes !== 0) result.PC += bytes;
             
             return result;
         }
@@ -182,5 +184,58 @@ instructionSet[0x50] = createInstruction(BVC, AddressMode.RELATIVE,    2);
 
 // BVS - Branch on VF = 1
 instructionSet[0x70] = createInstruction(BVS, AddressMode.RELATIVE,    2);
+
+// BIT - Test bits in memory with A
+instructionSet[0x24] = createInstruction(BIT, AddressMode.ZEROPAGE,    2);
+instructionSet[0x2C] = createInstruction(BIT, AddressMode.ABSOLUTE,    3);
+
+// BRK - Force break
+instructionSet[0x00] = createInstruction(BRK, AddressMode.IMPLIED,     0);
+
+// Get processor status
+export const getSR = (state: State, brk = false) => {
+    let value = 0;
+    if (state.NF) value = value | 0x80;
+    if (state.VF) value = value | 0x40;
+    value = value | 0x20; // Always true
+    if (brk) value = value | 0x10;
+    if (state.DF) value = value | 0x08;
+    if (state.IF) value = value | 0x04;
+    if (state.ZF) value = value | 0x02;
+    if (state.CF) value = value | 0x01;
+
+    return value;
+};
+
+// Stack management
+export const pushByte = (state: State, value: number) => {
+    state.memory[0x0100 | state.SP] = value;
+    state.SP--;
+};
+
+export const pushWord = (state: State, value: number) => {
+    state.memory[0x0100 | state.SP] = value >> 8;
+    state.memory[0x0100 | (state.SP - 1)] = value & 0xff;
+    state.SP -= 2;
+};
+
+export const popByte = (state: State) => {
+    state.SP++;
+    return state.memory[0x0100 | state.SP];
+};
+
+export const popWord = (state: State) => {
+    state.SP += 2;
+    return (state.memory[0x0100 | state.SP] << 8) | (state.memory[0x0100 | (state.SP - 1)] & 0xFFFF);
+};
+
+// IRQ
+export const performIRQ = (state: State, offset: number, brk = false) => {
+    pushWord(state, state.PC);
+    pushByte(state, getSR(state, brk));
+    state.IF = true;
+    state.PC = getWord(state, offset);
+    return state;
+};
 
 export default instructionSet;
