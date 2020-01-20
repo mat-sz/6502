@@ -2,6 +2,14 @@ import { State } from '.';
 
 import ADC from './instructions/ADC';
 import AND from './instructions/AND';
+import BCC from './instructions/BCC';
+import BCS from './instructions/BCS';
+import BEQ from './instructions/BEQ';
+import BMI from './instructions/BMI';
+import BNE from './instructions/BNE';
+import BPL from './instructions/BPL';
+import BVC from './instructions/BVC';
+import BVS from './instructions/BVS';
 
 export enum AddressMode {
     ACCUMULATOR, // Operand is A
@@ -150,5 +158,29 @@ instructionSet[0x06] = createInstruction(AND, AddressMode.ZEROPAGE,    2);
 instructionSet[0x16] = createInstruction(AND, AddressMode.ZEROPAGE_X,  2);
 instructionSet[0x0E] = createInstruction(AND, AddressMode.ABSOLUTE,    3);
 instructionSet[0x1E] = createInstruction(AND, AddressMode.ABSOLUTE_X,  3);
+
+// BCC - Branch on CF = 0
+instructionSet[0x90] = createInstruction(BCC, AddressMode.RELATIVE,    2);
+
+// BCS - Branch on CF = 1
+instructionSet[0xB0] = createInstruction(BCS, AddressMode.RELATIVE,    2);
+
+// BEQ - Branch on ZF = 1
+instructionSet[0xF0] = createInstruction(BEQ, AddressMode.RELATIVE,    2);
+
+// BMI - Branch on NF = 1
+instructionSet[0x30] = createInstruction(BMI, AddressMode.RELATIVE,    2);
+
+// BNE - Branch on ZF = 0
+instructionSet[0xD0] = createInstruction(BNE, AddressMode.RELATIVE,    2);
+
+// BPL - Branch on NF = 0
+instructionSet[0x10] = createInstruction(BPL, AddressMode.RELATIVE,    2);
+
+// BVC - Branch on VF = 0
+instructionSet[0x50] = createInstruction(BVC, AddressMode.RELATIVE,    2);
+
+// BVS - Branch on VF = 1
+instructionSet[0x70] = createInstruction(BVS, AddressMode.RELATIVE,    2);
 
 export default instructionSet;
