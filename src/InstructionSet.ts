@@ -19,6 +19,12 @@ import CLV from './instructions/CLV';
 import CMP from './instructions/CMP';
 import CPX from './instructions/CPX';
 import CPY from './instructions/CPY';
+import DEC from './instructions/DEC';
+import DEX from './instructions/DEX';
+import DEY from './instructions/DEY';
+import INC from './instructions/INC';
+import INX from './instructions/INX';
+import INY from './instructions/INY';
 
 export enum AddressMode {
     ACCUMULATOR, // Operand is A
@@ -120,7 +126,7 @@ const setOperand = (state: State, mode: AddressMode, value: number) => {
 };
 
 const createInstruction = (
-    fn: (state: State, operand: number, setOperand?: (value: number) => State) => State,
+    fn: (state: State, operand: number, setOperand: (value: number) => State) => State,
     addressMode: AddressMode, bytes: number) => {
 
     return {
@@ -230,6 +236,30 @@ instructionSet[0xEC] = createInstruction(CPX, AddressMode.ABSOLUTE,    3);
 instructionSet[0xC0] = createInstruction(CPY, AddressMode.IMMEDIATE,   2);
 instructionSet[0xC4] = createInstruction(CPY, AddressMode.ZEROPAGE,    2);
 instructionSet[0xCC] = createInstruction(CPY, AddressMode.ABSOLUTE,    3);
+
+// DEC - Decrement memory by one
+instructionSet[0xC6] = createInstruction(DEC, AddressMode.ZEROPAGE,    2);
+instructionSet[0xD6] = createInstruction(DEC, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0xCE] = createInstruction(DEC, AddressMode.ABSOLUTE,    3);
+instructionSet[0xDE] = createInstruction(DEC, AddressMode.ABSOLUTE_X,  3);
+
+// DEX - Decrement X by one
+instructionSet[0xCA] = createInstruction(DEX, AddressMode.IMPLIED,     1);
+
+// DEY - Decrement Y by one
+instructionSet[0x88] = createInstruction(DEY, AddressMode.IMPLIED,     1);
+
+// INC - Increment memory by one
+instructionSet[0xE6] = createInstruction(INC, AddressMode.ZEROPAGE,    2);
+instructionSet[0xF6] = createInstruction(INC, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0xEE] = createInstruction(INC, AddressMode.ABSOLUTE,    3);
+instructionSet[0xFE] = createInstruction(INC, AddressMode.ABSOLUTE_X,  3);
+
+// INX - Increment X by one
+instructionSet[0xE8] = createInstruction(INX, AddressMode.IMPLIED,     1);
+
+// INY - Increment Y by one
+instructionSet[0xC8] = createInstruction(INY, AddressMode.IMPLIED,     1);
 
 // Get processor status
 export const getSR = (state: State, brk = false) => {
