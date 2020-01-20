@@ -100,8 +100,12 @@ const getAddress = (state: State, mode: AddressMode) => {
         case AddressMode.INDIRECT_Y:
             return getWord(state, getImmediateWord(state)) + state.Y;
         case AddressMode.RELATIVE:
-            // << 24 >> 24 is a quick conversion to signed
-            return state.PC + (getImmediateByte(state) << 24 >> 24);
+            let value = getImmediateByte(state);
+            if (value >= 0x80) {
+                value -= 0xff;
+            }
+            
+            return state.PC + value;
         case AddressMode.ZEROPAGE:
             return getImmediateByte(state);
         case AddressMode.ZEROPAGE_X:
@@ -168,10 +172,9 @@ const createInstruction = (
         bytes: bytes,
         fn: (state: State) => {
             const operand = useAddress ? getAddress(state, addressMode) : getOperand(state, addressMode);
-            if (useAddress) console.log('ussss' + operand);
             
             const result = fn(state, operand, (value: number) => setOperand(state, addressMode, value));
-            if (bytes !== 0) result.PC += bytes;
+            result.PC += bytes;
             
             return result;
         }
@@ -241,28 +244,28 @@ instructionSet[0x6E] = createInstruction(ROR, AddressMode.ABSOLUTE,    3);
 instructionSet[0x7E] = createInstruction(ROR, AddressMode.ABSOLUTE_X,  3);
 
 // BCC - Branch on CF = 0
-instructionSet[0x90] = createInstruction(BCC, AddressMode.RELATIVE,    2);
+instructionSet[0x90] = createInstruction(BCC, AddressMode.RELATIVE,    2, true);
 
 // BCS - Branch on CF = 1
-instructionSet[0xB0] = createInstruction(BCS, AddressMode.RELATIVE,    2);
+instructionSet[0xB0] = createInstruction(BCS, AddressMode.RELATIVE,    2, true);
 
 // BEQ - Branch on ZF = 1
-instructionSet[0xF0] = createInstruction(BEQ, AddressMode.RELATIVE,    2);
+instructionSet[0xF0] = createInstruction(BEQ, AddressMode.RELATIVE,    2, true);
 
 // BMI - Branch on NF = 1
-instructionSet[0x30] = createInstruction(BMI, AddressMode.RELATIVE,    2);
+instructionSet[0x30] = createInstruction(BMI, AddressMode.RELATIVE,    2, true);
 
 // BNE - Branch on ZF = 0
-instructionSet[0xD0] = createInstruction(BNE, AddressMode.RELATIVE,    2);
+instructionSet[0xD0] = createInstruction(BNE, AddressMode.RELATIVE,    2, true);
 
 // BPL - Branch on NF = 0
-instructionSet[0x10] = createInstruction(BPL, AddressMode.RELATIVE,    2);
+instructionSet[0x10] = createInstruction(BPL, AddressMode.RELATIVE,    2, true);
 
 // BVC - Branch on VF = 0
-instructionSet[0x50] = createInstruction(BVC, AddressMode.RELATIVE,    2);
+instructionSet[0x50] = createInstruction(BVC, AddressMode.RELATIVE,    2, true);
 
 // BVS - Branch on VF = 1
-instructionSet[0x70] = createInstruction(BVS, AddressMode.RELATIVE,    2);
+instructionSet[0x70] = createInstruction(BVS, AddressMode.RELATIVE,    2, true);
 
 // BIT - Test bits in memory with A
 instructionSet[0x24] = createInstruction(BIT, AddressMode.ZEROPAGE,    2);
@@ -357,11 +360,11 @@ instructionSet[0x01] = createInstruction(ORA, AddressMode.INDIRECT_X,  2);
 instructionSet[0x11] = createInstruction(ORA, AddressMode.INDIRECT_Y,  2);
 
 // JMP - Jump
-instructionSet[0x4C] = createInstruction(JMP, AddressMode.ABSOLUTE,    3, true);
-instructionSet[0x6C] = createInstruction(JMP, AddressMode.INDIRECT,    3, true);
+instructionSet[0x4C] = createInstruction(JMP, AddressMode.ABSOLUTE,    0, true);
+instructionSet[0x6C] = createInstruction(JMP, AddressMode.INDIRECT,    0, true);
 
 // JSR - Jump to subroutine
-instructionSet[0x20] = createInstruction(JSR, AddressMode.ABSOLUTE,    3, true);
+instructionSet[0x20] = createInstruction(JSR, AddressMode.ABSOLUTE,    0, true);
 
 // RTI - Return from interrupt
 instructionSet[0x40] = createInstruction(RTI, AddressMode.IMPLIED,     1);

@@ -68,7 +68,11 @@ export class CPU {
         if (code in instructionSet) {
             this.state = instructionSet[code].fn(this.state);
         } else {
-            throw new Error('Unsupported opcode.');
+            throw new Error('Unsupported opcode. ' + code.toString(16) + ' at ' + this.state.PC.toString(16));
+        }
+        
+        if (this.state.DF) {
+            throw new Error('Decimal mode is not supported yet.');
         }
     }
 
