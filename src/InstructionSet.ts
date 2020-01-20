@@ -35,6 +35,19 @@ import PHA from './instructions/PHA';
 import PHP from './instructions/PHP';
 import PLA from './instructions/PLA';
 import PLP from './instructions/PLP';
+import LDA from './instructions/LDA';
+import LDX from './instructions/LDX';
+import LDY from './instructions/LDY';
+import STA from './instructions/STA';
+import STX from './instructions/STX';
+import STY from './instructions/STY';
+import NOP from './instructions/NOP';
+import TAX from './instructions/TAX';
+import TAY from './instructions/TAY';
+import TSX from './instructions/TSX';
+import TXA from './instructions/TXA';
+import TXS from './instructions/TXS';
+import TYA from './instructions/TYA';
 
 export enum AddressMode {
     ACCUMULATOR, // Operand is A
@@ -315,6 +328,70 @@ instructionSet[0x68] = createInstruction(PLA, AddressMode.IMPLIED,     1);
 
 // PLP - Pull SR from stack
 instructionSet[0x28] = createInstruction(PLP, AddressMode.IMPLIED,     1);
+
+// LDA - Load A from memory
+instructionSet[0xA9] = createInstruction(LDA, AddressMode.IMMEDIATE,   2);
+instructionSet[0xA5] = createInstruction(LDA, AddressMode.ZEROPAGE,    2);
+instructionSet[0xB5] = createInstruction(LDA, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0xAD] = createInstruction(LDA, AddressMode.ABSOLUTE,    3);
+instructionSet[0xBD] = createInstruction(LDA, AddressMode.ABSOLUTE_X,  3);
+instructionSet[0xB9] = createInstruction(LDA, AddressMode.ABSOLUTE_Y,  3);
+instructionSet[0xA1] = createInstruction(LDA, AddressMode.INDIRECT_X,  2);
+instructionSet[0xA1] = createInstruction(LDA, AddressMode.INDIRECT_Y,  2);
+
+// LDX - Load X from memory
+instructionSet[0xA2] = createInstruction(LDX, AddressMode.IMMEDIATE,   2);
+instructionSet[0xA6] = createInstruction(LDX, AddressMode.ZEROPAGE,    2);
+instructionSet[0xB6] = createInstruction(LDX, AddressMode.ZEROPAGE_Y,  2);
+instructionSet[0xAE] = createInstruction(LDX, AddressMode.ABSOLUTE,    3);
+instructionSet[0xBE] = createInstruction(LDX, AddressMode.ABSOLUTE_Y,  3);
+
+// LDY - Load Y from memory
+instructionSet[0xA0] = createInstruction(LDY, AddressMode.IMMEDIATE,   2);
+instructionSet[0xA4] = createInstruction(LDY, AddressMode.ZEROPAGE,    2);
+instructionSet[0xB4] = createInstruction(LDY, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0xAC] = createInstruction(LDY, AddressMode.ABSOLUTE,    3);
+instructionSet[0xBC] = createInstruction(LDY, AddressMode.ABSOLUTE_X,  3);
+
+// STA - Store A in memory
+instructionSet[0x85] = createInstruction(STA, AddressMode.ZEROPAGE,    2);
+instructionSet[0x95] = createInstruction(STA, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0x8D] = createInstruction(STA, AddressMode.ABSOLUTE,    3);
+instructionSet[0x9D] = createInstruction(STA, AddressMode.ABSOLUTE_X,  3);
+instructionSet[0x99] = createInstruction(STA, AddressMode.ABSOLUTE_Y,  3);
+instructionSet[0x81] = createInstruction(STA, AddressMode.INDIRECT_X,  2);
+instructionSet[0x91] = createInstruction(STA, AddressMode.INDIRECT_Y,  2);
+
+// STA - Store X in memory
+instructionSet[0x86] = createInstruction(STX, AddressMode.ZEROPAGE,    2);
+instructionSet[0x96] = createInstruction(STX, AddressMode.ZEROPAGE_Y,  2);
+instructionSet[0x8E] = createInstruction(STX, AddressMode.ABSOLUTE,    3);
+
+// STY - Store Y in memory
+instructionSet[0x84] = createInstruction(STY, AddressMode.ZEROPAGE,    2);
+instructionSet[0x94] = createInstruction(STY, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0x8C] = createInstruction(STY, AddressMode.ABSOLUTE,    3);
+
+// NOP - No operation
+instructionSet[0xEA] = createInstruction(NOP, AddressMode.IMPLIED,     1);
+
+// TAX - Transfer A to X
+instructionSet[0xAA] = createInstruction(TAX, AddressMode.IMPLIED,     1);
+
+// TAY - Transfer A to Y
+instructionSet[0xA8] = createInstruction(TAY, AddressMode.IMPLIED,     1);
+
+// TSX - Transfer SP to X
+instructionSet[0xBA] = createInstruction(TSX, AddressMode.IMPLIED,     1);
+
+// TXA - Transfer X to A
+instructionSet[0x8A] = createInstruction(TXA, AddressMode.IMPLIED,     1);
+
+// TXS - Transfer X to SP
+instructionSet[0x9A] = createInstruction(TXS, AddressMode.IMPLIED,     1);
+
+// TYA - Transfer Y to A
+instructionSet[0x98] = createInstruction(TYA, AddressMode.IMPLIED,     1);
 
 // Processor status
 export const getSR = (state: State, brk = false) => {
