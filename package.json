@@ -1,0 +1,25 @@
+{
+  "name": "6502",
+  "version": "0.0.1",
+  "description": "6502 emulator",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mat-sz/6502.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mat-sz/6502/issues"
+  },
+  "homepage": "https://github.com/mat-sz/6502",
+  "author": "Mat Sz <contact@matsz.dev>",
+  "license": "BSD-3-Clause-Clear",
+  "private": false,
+  "devDependencies": {
+    "typescript": "^3.7.4"
+  }
+}
