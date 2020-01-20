@@ -48,6 +48,13 @@ import TSX from './instructions/TSX';
 import TXA from './instructions/TXA';
 import TXS from './instructions/TXS';
 import TYA from './instructions/TYA';
+import LSR from './instructions/LSR';
+import SBC from './instructions/SBC';
+import ROL from './instructions/ROL';
+import ROR from './instructions/ROR';
+import SEC from './instructions/SEC';
+import SED from './instructions/SED';
+import SEI from './instructions/SEI';
 
 export enum AddressMode {
     ACCUMULATOR, // Operand is A
@@ -190,12 +197,43 @@ instructionSet[0x39] = createInstruction(AND, AddressMode.ABSOLUTE_Y,  3);
 instructionSet[0x21] = createInstruction(AND, AddressMode.INDIRECT_X,  2);
 instructionSet[0x31] = createInstruction(AND, AddressMode.INDIRECT_Y,  2);
 
+// SBC - Subtract with A
+instructionSet[0xE9] = createInstruction(SBC, AddressMode.IMMEDIATE,   2);
+instructionSet[0xE5] = createInstruction(SBC, AddressMode.ZEROPAGE,    2);
+instructionSet[0xF5] = createInstruction(SBC, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0xED] = createInstruction(SBC, AddressMode.ABSOLUTE,    3);
+instructionSet[0xFD] = createInstruction(SBC, AddressMode.ABSOLUTE_X,  3);
+instructionSet[0xF9] = createInstruction(SBC, AddressMode.ABSOLUTE_Y,  3);
+instructionSet[0xE1] = createInstruction(SBC, AddressMode.INDIRECT_X,  2);
+instructionSet[0xF1] = createInstruction(SBC, AddressMode.INDIRECT_Y,  2);
+
 // ASL - Arithmetic shift left
 instructionSet[0x0A] = createInstruction(AND, AddressMode.ACCUMULATOR, 1);
 instructionSet[0x06] = createInstruction(AND, AddressMode.ZEROPAGE,    2);
 instructionSet[0x16] = createInstruction(AND, AddressMode.ZEROPAGE_X,  2);
 instructionSet[0x0E] = createInstruction(AND, AddressMode.ABSOLUTE,    3);
 instructionSet[0x1E] = createInstruction(AND, AddressMode.ABSOLUTE_X,  3);
+
+// LSR - Logical shift right
+instructionSet[0x4A] = createInstruction(LSR, AddressMode.ACCUMULATOR, 1);
+instructionSet[0x46] = createInstruction(LSR, AddressMode.ZEROPAGE,    2);
+instructionSet[0x56] = createInstruction(LSR, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0x4E] = createInstruction(LSR, AddressMode.ABSOLUTE,    3);
+instructionSet[0x5E] = createInstruction(LSR, AddressMode.ABSOLUTE_X,  3);
+
+// ROL - Rotate one bit left
+instructionSet[0x2A] = createInstruction(ROL, AddressMode.ACCUMULATOR, 1);
+instructionSet[0x26] = createInstruction(ROL, AddressMode.ZEROPAGE,    2);
+instructionSet[0x36] = createInstruction(ROL, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0x2E] = createInstruction(ROL, AddressMode.ABSOLUTE,    3);
+instructionSet[0x3E] = createInstruction(ROL, AddressMode.ABSOLUTE_X,  3);
+
+// ROL - Rotate one bit left
+instructionSet[0x6A] = createInstruction(ROR, AddressMode.ACCUMULATOR, 1);
+instructionSet[0x66] = createInstruction(ROR, AddressMode.ZEROPAGE,    2);
+instructionSet[0x76] = createInstruction(ROR, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0x6E] = createInstruction(ROR, AddressMode.ABSOLUTE,    3);
+instructionSet[0x7E] = createInstruction(ROR, AddressMode.ABSOLUTE_X,  3);
 
 // BCC - Branch on CF = 0
 instructionSet[0x90] = createInstruction(BCC, AddressMode.RELATIVE,    2);
@@ -239,6 +277,15 @@ instructionSet[0x58] = createInstruction(CLI, AddressMode.IMPLIED,     1);
 
 // CLV - Clear VF
 instructionSet[0xB8] = createInstruction(CLV, AddressMode.IMPLIED,     1);
+
+// SEC - Clear CF
+instructionSet[0x38] = createInstruction(SEC, AddressMode.IMPLIED,     1);
+
+// SED - Clear DF
+instructionSet[0xF8] = createInstruction(SED, AddressMode.IMPLIED,     1);
+
+// SEI - Clear IF
+instructionSet[0x78] = createInstruction(SEI, AddressMode.IMPLIED,     1);
 
 // CMP - Compare memory with A
 instructionSet[0xC9] = createInstruction(CMP, AddressMode.IMMEDIATE,   2);
