@@ -71,4 +71,20 @@ export class CPU {
             throw new Error('Unsupported opcode.');
         }
     }
+
+    /**
+     * Starts execution from a given address.
+     * @param address 
+     */
+    execute(address: number) {
+        let oldPC = 0;
+        this.state.PC = address;
+
+        while (this.state.PC != oldPC) {
+            oldPC = this.state.PC;
+            this.step();
+        }
+
+        return this.state;
+    }
 };

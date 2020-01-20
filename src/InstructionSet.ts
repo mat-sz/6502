@@ -85,35 +85,53 @@ const getWord = (state: State, offset: number) => ((state.memory[offset + 1] << 
 const getImmediateWord = (state: State) => getWord(state, state.PC + 1);
 const getImmediateByte = (state: State) => state.memory[state.PC + 1];
 
+const getAddress = (state: State, mode: AddressMode) => {
+    switch (mode) {
+        case AddressMode.ABSOLUTE:
+            return getImmediateWord(state);
+        case AddressMode.ABSOLUTE_X:
+            return getImmediateWord(state) + state.X;
+        case AddressMode.ABSOLUTE_Y:
+            return getImmediateWord(state) + state.Y;
+        case AddressMode.INDIRECT:
+            return getWord(state, getImmediateWord(state));
+        case AddressMode.INDIRECT_X:
+            return getWord(state, getImmediateWord(state) + state.X);
+        case AddressMode.INDIRECT_Y:
+            return getWord(state, getImmediateWord(state)) + state.Y;
+        case AddressMode.RELATIVE:
+            // << 24 >> 24 is a quick conversion to signed
+            return state.PC + (getImmediateByte(state) << 24 >> 24);
+        case AddressMode.ZEROPAGE:
+            return getImmediateByte(state);
+        case AddressMode.ZEROPAGE_X:
+            return (getImmediateByte(state) + state.X) & 0xff;
+        case AddressMode.ZEROPAGE_Y:
+            return (getImmediateByte(state) + state.Y) & 0xff;
+        default:
+            throw new Error('Incorrect address mode');
+    }
+};
+
 const getOperand = (state: State, mode: AddressMode) => {
     switch (mode) {
         case AddressMode.ACCUMULATOR:
             return state.A;
         case AddressMode.ABSOLUTE:
-            return state.memory[getImmediateWord(state)];
         case AddressMode.ABSOLUTE_X:
-            return state.memory[getImmediateWord(state) + state.X];
         case AddressMode.ABSOLUTE_Y:
-            return state.memory[getImmediateWord(state) + state.Y];
+        case AddressMode.INDIRECT:
+        case AddressMode.INDIRECT_X:
+        case AddressMode.INDIRECT_Y:
+        case AddressMode.RELATIVE:
+        case AddressMode.ZEROPAGE:
+        case AddressMode.ZEROPAGE_X:
+        case AddressMode.ZEROPAGE_Y:
+            return state.memory[getAddress(state, mode)];
         case AddressMode.IMMEDIATE:
             return getImmediateByte(state);
         case AddressMode.IMPLIED:
             return 0;
-        case AddressMode.INDIRECT:
-            return state.memory[getWord(state, getImmediateWord(state))];
-        case AddressMode.INDIRECT_X:
-            return state.memory[getWord(state, getImmediateWord(state) + state.X)];
-        case AddressMode.INDIRECT_Y:
-            return state.memory[getWord(state, getImmediateWord(state)) + state.Y];
-        case AddressMode.RELATIVE:
-            // << 24 >> 24 is a quick conversion to signed
-            return state.memory[state.PC + (getImmediateByte(state) << 24 >> 24)];
-        case AddressMode.ZEROPAGE:
-            return state.memory[getImmediateByte(state)];
-        case AddressMode.ZEROPAGE_X:
-            return state.memory[(getImmediateByte(state) + state.X) & 0xff];
-        case AddressMode.ZEROPAGE_Y:
-            return state.memory[(getImmediateByte(state) + state.Y) & 0xff];
         default:
             throw new Error('Incorrect address mode');
     }
@@ -125,28 +143,14 @@ const setOperand = (state: State, mode: AddressMode, value: number) => {
             state.A = value;
             break;
         case AddressMode.ABSOLUTE:
-            state.memory[getImmediateWord(state)] = value;
-            break;
         case AddressMode.ABSOLUTE_X:
-            state.memory[getImmediateWord(state) + state.X] = value;
-            break;
         case AddressMode.ABSOLUTE_Y:
-            state.memory[getImmediateWord(state) + state.Y] = value;
-            break;
         case AddressMode.INDIRECT_X:
-            state.memory[getWord(state, getImmediateWord(state) + state.X)] = value;
-            break;
         case AddressMode.INDIRECT_Y:
-            state.memory[getWord(state, getImmediateWord(state)) + state.Y] = value;
-            break;
         case AddressMode.ZEROPAGE:
-            state.memory[getImmediateByte(state)] = value;
-            break;
         case AddressMode.ZEROPAGE_X:
-            state.memory[(getImmediateByte(state) + state.X) & 0xff] = value;
-            break;
         case AddressMode.ZEROPAGE_Y:
-            state.memory[(getImmediateByte(state) + state.Y) & 0xff] = value;
+            state.memory[getAddress(state, mode)] = value;
             break;
         default:
             throw new Error('Incorrect address mode');
@@ -157,14 +161,15 @@ const setOperand = (state: State, mode: AddressMode, value: number) => {
 
 const createInstruction = (
     fn: (state: State, operand: number, setOperand: (value: number) => State) => State,
-    addressMode: AddressMode, bytes: number) => {
+    addressMode: AddressMode, bytes: number, useAddress = false) => {
 
     return {
         addressMode: addressMode,
         bytes: bytes,
         fn: (state: State) => {
-            const operand = getOperand(state, addressMode);
-    
+            const operand = useAddress ? getAddress(state, addressMode) : getOperand(state, addressMode);
+            if (useAddress) console.log('ussss' + operand);
+            
             const result = fn(state, operand, (value: number) => setOperand(state, addressMode, value));
             if (bytes !== 0) result.PC += bytes;
             
@@ -352,11 +357,11 @@ instructionSet[0x01] = createInstruction(ORA, AddressMode.INDIRECT_X,  2);
 instructionSet[0x11] = createInstruction(ORA, AddressMode.INDIRECT_Y,  2);
 
 // JMP - Jump
-instructionSet[0x4C] = createInstruction(JMP, AddressMode.ABSOLUTE,    3);
-instructionSet[0x6C] = createInstruction(JMP, AddressMode.INDIRECT,    3);
+instructionSet[0x4C] = createInstruction(JMP, AddressMode.ABSOLUTE,    3, true);
+instructionSet[0x6C] = createInstruction(JMP, AddressMode.INDIRECT,    3, true);
 
 // JSR - Jump to subroutine
-instructionSet[0x20] = createInstruction(JSR, AddressMode.ABSOLUTE,    3);
+instructionSet[0x20] = createInstruction(JSR, AddressMode.ABSOLUTE,    3, true);
 
 // RTI - Return from interrupt
 instructionSet[0x40] = createInstruction(RTI, AddressMode.IMPLIED,     1);
@@ -384,7 +389,7 @@ instructionSet[0xAD] = createInstruction(LDA, AddressMode.ABSOLUTE,    3);
 instructionSet[0xBD] = createInstruction(LDA, AddressMode.ABSOLUTE_X,  3);
 instructionSet[0xB9] = createInstruction(LDA, AddressMode.ABSOLUTE_Y,  3);
 instructionSet[0xA1] = createInstruction(LDA, AddressMode.INDIRECT_X,  2);
-instructionSet[0xA1] = createInstruction(LDA, AddressMode.INDIRECT_Y,  2);
+instructionSet[0xB1] = createInstruction(LDA, AddressMode.INDIRECT_Y,  2);
 
 // LDX - Load X from memory
 instructionSet[0xA2] = createInstruction(LDX, AddressMode.IMMEDIATE,   2);
