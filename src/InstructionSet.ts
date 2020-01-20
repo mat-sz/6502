@@ -1,8 +1,10 @@
-import { State } from ".";
+import { State } from '.';
+
+import ADC from './instructions/ADC';
 
 export enum InstructionType {
     ADC, // Add with carry
-    AND, // Add with A
+    AND, // And with A
     ASL, // Ariithmetic shift left
     BCC, // Branch on carry clear
     BCS, // Branch on carry set
@@ -81,7 +83,7 @@ export type InstructionFunction = (state: State) => State;
 export interface Instruction {
     addressMode: AddressMode,
     bytes: number,
-    function: InstructionFunction,
+    fn: InstructionFunction,
 };
 
 const getWord = (state: State, offset: number) => ((state.memory[offset + 1] << 8 | state.memory[offset]) & 0xFFFF);
@@ -122,15 +124,30 @@ const getOperand = (state: State, mode: AddressMode) => {
     }
 };
 
-const wrapFunction = (fn: (state: State, operand: number) => State, instruction: Instruction) => {
-    return (state: State) => {
-        const operand = getOperand(state, instruction.addressMode);
-
-        const result = fn(state, operand);
-        result.PC += instruction.bytes;
-        
-        return result;
-    };
+const createInstruction = (fn: (state: State, operand: number) => State, addressMode: AddressMode, bytes: number) => {
+    return {
+        addressMode: addressMode,
+        bytes: bytes,
+        fn: (state: State) => {
+            const operand = getOperand(state, addressMode);
+    
+            const result = fn(state, operand);
+            result.PC += bytes;
+            
+            return result;
+        }
+    } as Instruction;
 };
 
-let instructionSet = [];
+let instructionSet: Instruction[] = [];
+
+// Based on: https://www.masswerk.at/6502/6502_instruction_set.html
+
+instructionSet[0x69] = createInstruction(ADC, AddressMode.IMMEDIATE,  2);
+instructionSet[0x65] = createInstruction(ADC, AddressMode.ZEROPAGE,   2);
+instructionSet[0x75] = createInstruction(ADC, AddressMode.ZEROPAGE_X, 2);
+instructionSet[0x6D] = createInstruction(ADC, AddressMode.ABSOLUTE,   3);
+instructionSet[0x7D] = createInstruction(ADC, AddressMode.ABSOLUTE_X, 3);
+instructionSet[0x79] = createInstruction(ADC, AddressMode.ABSOLUTE_Y, 3);
+instructionSet[0x61] = createInstruction(ADC, AddressMode.INDIRECT_X, 2);
+instructionSet[0x71] = createInstruction(ADC, AddressMode.INDIRECT_Y, 2);
