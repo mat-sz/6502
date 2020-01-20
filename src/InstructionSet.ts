@@ -151,3 +151,5 @@ instructionSet[0x7D] = createInstruction(ADC, AddressMode.ABSOLUTE_X, 3);
 instructionSet[0x79] = createInstruction(ADC, AddressMode.ABSOLUTE_Y, 3);
 instructionSet[0x61] = createInstruction(ADC, AddressMode.INDIRECT_X, 2);
 instructionSet[0x71] = createInstruction(ADC, AddressMode.INDIRECT_Y, 2);
+
+export default instructionSet;

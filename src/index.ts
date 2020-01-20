@@ -1,3 +1,4 @@
+import instructionSet from './InstructionSet';
 export const MEMORY_SIZE = 65536;
 
 export interface State {
@@ -16,8 +17,7 @@ export interface State {
     CF: boolean; // Carry flag
 
     memory: Uint8Array; // Memory (at most 64KiB)
-
-}
+};
 
 export class CPU {
     private state: State = {
@@ -57,6 +57,18 @@ export class CPU {
 
         if (updatePC) {
             this.state.PC = offset;
+        }
+    }
+
+    /**
+     * Executes next instruction.
+     */
+    step() {
+        const code = this.state.memory[this.state.PC];
+        if (code in instructionSet) {
+            this.state = instructionSet[code].fn(this.state);
+        } else {
+            throw new Error('Unsupported opcode.');
         }
     }
 };
