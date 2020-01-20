@@ -12,6 +12,10 @@ import BVC from './instructions/BVC';
 import BVS from './instructions/BVS';
 import BIT from './instructions/BIT';
 import BRK from './instructions/BRK';
+import CLC from './instructions/CLC';
+import CLD from './instructions/CLD';
+import CLI from './instructions/CLI';
+import CLV from './instructions/CLV';
 
 export enum AddressMode {
     ACCUMULATOR, // Operand is A
@@ -191,6 +195,18 @@ instructionSet[0x2C] = createInstruction(BIT, AddressMode.ABSOLUTE,    3);
 
 // BRK - Force break
 instructionSet[0x00] = createInstruction(BRK, AddressMode.IMPLIED,     0);
+
+// CLC - Clear CF
+instructionSet[0x18] = createInstruction(CLC, AddressMode.IMPLIED,     1);
+
+// CLD - Clear DF
+instructionSet[0xD8] = createInstruction(CLD, AddressMode.IMPLIED,     1);
+
+// CLI - Clear IF
+instructionSet[0x58] = createInstruction(CLI, AddressMode.IMPLIED,     1);
+
+// CLV - Clear VF
+instructionSet[0xB8] = createInstruction(CLV, AddressMode.IMPLIED,     1);
 
 // Get processor status
 export const getSR = (state: State, brk = false) => {
