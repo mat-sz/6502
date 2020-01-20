@@ -1,65 +1,7 @@
 import { State } from '.';
 
 import ADC from './instructions/ADC';
-
-export enum InstructionType {
-    ADC, // Add with carry
-    AND, // And with A
-    ASL, // Ariithmetic shift left
-    BCC, // Branch on carry clear
-    BCS, // Branch on carry set
-    BEQ, // Branch on equal
-    BIT, // Bit test
-    BMI, // Branch on minus
-    BNE, // Branch on not equal
-    BPL, // Branch on plus
-    BRK, // Break
-    BVC, // Branch on overflow clear
-    BVS, // Branch on overflow set
-    CLC, // Clear carry
-    CLD, // Clear decimal
-    CLI, // Clear interrupt disable
-    CLV, // Clear overflow
-    CMP, // Compare with A
-    CPX, // Compare with X
-    CPY, // Compare with Y
-    DEC, // Decrement A
-    DEX, // Decrement X
-    DEY, // Decrement Y
-    EOR, // XOR with A
-    INC, // Increment A
-    INX, // Increment X
-    INY, // Increment Y
-    JMP, // Jump
-    JSR, // Jump subroutine
-    LDA, // Load acumulator
-    LDX, // Load X
-    LDY, // Load Y
-    LSR, // Logical shift right
-    NOP, // No operation
-    ORA, // Or with A
-    PHA, // Push A
-    PHP, // Push SR
-    PLA, // Pull A
-    PLP, // Pull SR
-    ROL, // Rotate left
-    ROR, // Rotate right
-    RTI, // Return from interrupt
-    RTS, // Return from subroutine
-    SBC, // Subtract with carry
-    SEC, // Set carry
-    SED, // Set decimal
-    SEI, // Set interrupt disable
-    STA, // Store A
-    STX, // Store X
-    STY, // Store Y
-    TAX, // Transfer A to X
-    TAY, // Transfer A to Y
-    TSX, // Transfer SP to X
-    TXA, // Transfer X to A
-    TXS, // Transfer X to SP
-    TYA, // Transfer Y to A
-};
+import AND from './instructions/AND';
 
 export enum AddressMode {
     ACCUMULATOR, // Operand is A
@@ -143,6 +85,7 @@ let instructionSet: Instruction[] = [];
 
 // Based on: https://www.masswerk.at/6502/6502_instruction_set.html
 
+// ADC - Add with carry
 instructionSet[0x69] = createInstruction(ADC, AddressMode.IMMEDIATE,  2);
 instructionSet[0x65] = createInstruction(ADC, AddressMode.ZEROPAGE,   2);
 instructionSet[0x75] = createInstruction(ADC, AddressMode.ZEROPAGE_X, 2);
@@ -151,5 +94,15 @@ instructionSet[0x7D] = createInstruction(ADC, AddressMode.ABSOLUTE_X, 3);
 instructionSet[0x79] = createInstruction(ADC, AddressMode.ABSOLUTE_Y, 3);
 instructionSet[0x61] = createInstruction(ADC, AddressMode.INDIRECT_X, 2);
 instructionSet[0x71] = createInstruction(ADC, AddressMode.INDIRECT_Y, 2);
+
+// AND - And with A
+instructionSet[0x29] = createInstruction(AND, AddressMode.IMMEDIATE,  2);
+instructionSet[0x25] = createInstruction(AND, AddressMode.ZEROPAGE,   2);
+instructionSet[0x35] = createInstruction(AND, AddressMode.ZEROPAGE_X, 2);
+instructionSet[0x2D] = createInstruction(AND, AddressMode.ABSOLUTE,   3);
+instructionSet[0x3D] = createInstruction(AND, AddressMode.ABSOLUTE_X, 3);
+instructionSet[0x39] = createInstruction(AND, AddressMode.ABSOLUTE_Y, 3);
+instructionSet[0x21] = createInstruction(AND, AddressMode.INDIRECT_X, 2);
+instructionSet[0x31] = createInstruction(AND, AddressMode.INDIRECT_Y, 2);
 
 export default instructionSet;
