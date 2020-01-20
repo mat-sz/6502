@@ -16,6 +16,9 @@ import CLC from './instructions/CLC';
 import CLD from './instructions/CLD';
 import CLI from './instructions/CLI';
 import CLV from './instructions/CLV';
+import CMP from './instructions/CMP';
+import CPX from './instructions/CPX';
+import CPY from './instructions/CPY';
 
 export enum AddressMode {
     ACCUMULATOR, // Operand is A
@@ -207,6 +210,26 @@ instructionSet[0x58] = createInstruction(CLI, AddressMode.IMPLIED,     1);
 
 // CLV - Clear VF
 instructionSet[0xB8] = createInstruction(CLV, AddressMode.IMPLIED,     1);
+
+// CMP - Compare memory with A
+instructionSet[0xC9] = createInstruction(CMP, AddressMode.IMMEDIATE,   2);
+instructionSet[0xC5] = createInstruction(CMP, AddressMode.ZEROPAGE,    2);
+instructionSet[0xD5] = createInstruction(CMP, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0xCD] = createInstruction(CMP, AddressMode.ABSOLUTE,    3);
+instructionSet[0xDD] = createInstruction(CMP, AddressMode.ABSOLUTE_X,  3);
+instructionSet[0xD9] = createInstruction(CMP, AddressMode.ABSOLUTE_Y,  3);
+instructionSet[0xC1] = createInstruction(CMP, AddressMode.INDIRECT_X,  2);
+instructionSet[0xD1] = createInstruction(CMP, AddressMode.INDIRECT_Y,  2);
+
+// CMP - Compare memory with X
+instructionSet[0xE0] = createInstruction(CPX, AddressMode.IMMEDIATE,   2);
+instructionSet[0xE4] = createInstruction(CPX, AddressMode.ZEROPAGE,    2);
+instructionSet[0xEC] = createInstruction(CPX, AddressMode.ABSOLUTE,    3);
+
+// CMP - Compare memory with Y
+instructionSet[0xC0] = createInstruction(CPY, AddressMode.IMMEDIATE,   2);
+instructionSet[0xC4] = createInstruction(CPY, AddressMode.ZEROPAGE,    2);
+instructionSet[0xCC] = createInstruction(CPY, AddressMode.ABSOLUTE,    3);
 
 // Get processor status
 export const getSR = (state: State, brk = false) => {
