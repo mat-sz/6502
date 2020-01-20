@@ -25,6 +25,16 @@ import DEY from './instructions/DEY';
 import INC from './instructions/INC';
 import INX from './instructions/INX';
 import INY from './instructions/INY';
+import EOR from './instructions/EOR';
+import ORA from './instructions/ORA';
+import JMP from './instructions/JMP';
+import JSR from './instructions/JSR';
+import RTI from './instructions/RTI';
+import RTS from './instructions/RTS';
+import PHA from './instructions/PHA';
+import PHP from './instructions/PHP';
+import PLA from './instructions/PLA';
+import PLP from './instructions/PLP';
 
 export enum AddressMode {
     ACCUMULATOR, // Operand is A
@@ -261,7 +271,52 @@ instructionSet[0xE8] = createInstruction(INX, AddressMode.IMPLIED,     1);
 // INY - Increment Y by one
 instructionSet[0xC8] = createInstruction(INY, AddressMode.IMPLIED,     1);
 
-// Get processor status
+// EOR - XOR with A
+instructionSet[0x49] = createInstruction(EOR, AddressMode.IMMEDIATE,   2);
+instructionSet[0x45] = createInstruction(EOR, AddressMode.ZEROPAGE,    2);
+instructionSet[0x55] = createInstruction(EOR, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0x4D] = createInstruction(EOR, AddressMode.ABSOLUTE,    3);
+instructionSet[0x5D] = createInstruction(EOR, AddressMode.ABSOLUTE_X,  3);
+instructionSet[0x59] = createInstruction(EOR, AddressMode.ABSOLUTE_Y,  3);
+instructionSet[0x41] = createInstruction(EOR, AddressMode.INDIRECT_X,  2);
+instructionSet[0x51] = createInstruction(EOR, AddressMode.INDIRECT_Y,  2);
+
+// ORA - OR with A
+instructionSet[0x09] = createInstruction(ORA, AddressMode.IMMEDIATE,   2);
+instructionSet[0x05] = createInstruction(ORA, AddressMode.ZEROPAGE,    2);
+instructionSet[0x15] = createInstruction(ORA, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0x0D] = createInstruction(ORA, AddressMode.ABSOLUTE,    3);
+instructionSet[0x1D] = createInstruction(ORA, AddressMode.ABSOLUTE_X,  3);
+instructionSet[0x19] = createInstruction(ORA, AddressMode.ABSOLUTE_Y,  3);
+instructionSet[0x01] = createInstruction(ORA, AddressMode.INDIRECT_X,  2);
+instructionSet[0x11] = createInstruction(ORA, AddressMode.INDIRECT_Y,  2);
+
+// JMP - Jump
+instructionSet[0x4C] = createInstruction(JMP, AddressMode.ABSOLUTE,    3);
+instructionSet[0x6C] = createInstruction(JMP, AddressMode.INDIRECT,    3);
+
+// JSR - Jump to subroutine
+instructionSet[0x20] = createInstruction(JSR, AddressMode.ABSOLUTE,    3);
+
+// RTI - Return from interrupt
+instructionSet[0x40] = createInstruction(RTI, AddressMode.IMPLIED,     1);
+
+// RTS - Return from subroutine
+instructionSet[0x60] = createInstruction(RTS, AddressMode.IMPLIED,     1);
+
+// PHA - Push A on stack
+instructionSet[0x48] = createInstruction(PHA, AddressMode.IMPLIED,     1);
+
+// PHP - Push SR on stack
+instructionSet[0x08] = createInstruction(PHP, AddressMode.IMPLIED,     1);
+
+// PLA - Pull A from stack
+instructionSet[0x68] = createInstruction(PLA, AddressMode.IMPLIED,     1);
+
+// PLP - Pull SR from stack
+instructionSet[0x28] = createInstruction(PLP, AddressMode.IMPLIED,     1);
+
+// Processor status
 export const getSR = (state: State, brk = false) => {
     let value = 0;
     if (state.NF) value = value | 0x80;
@@ -276,16 +331,29 @@ export const getSR = (state: State, brk = false) => {
     return value;
 };
 
+export const setSR = (state: State, value: number) => {
+    state.NF = (value & 0x80) === 0x80;
+    state.VF = (value & 0x40) === 0x40;
+    state.DF = (value & 0x08) === 0x08;
+    state.IF = (value & 0x04) === 0x04;
+    state.ZF = (value & 0x02) === 0x02;
+    state.CF = (value & 0x01) === 0x01;
+
+    return state;
+};
+
 // Stack management
 export const pushByte = (state: State, value: number) => {
     state.memory[0x0100 | state.SP] = value;
     state.SP--;
+    return state;
 };
 
 export const pushWord = (state: State, value: number) => {
     state.memory[0x0100 | state.SP] = value >> 8;
     state.memory[0x0100 | (state.SP - 1)] = value & 0xff;
     state.SP -= 2;
+    return state;
 };
 
 export const popByte = (state: State) => {
