@@ -41,4 +41,22 @@ export class CPU {
     constructor() {
 
     }
+
+    /**
+     * Loads data into memory at a given offset
+     * @param offset 
+     * @param data 
+     * @param updatePC Should the program counter be updated to the given offset. (true by default)
+     */
+    load(offset: number, data: Uint8Array, updatePC = true) {
+        if (offset + data.length > MEMORY_SIZE) {
+            throw new Error('Memory out of bounds.');
+        }
+
+        this.state.memory.set(data, offset);
+
+        if (updatePC) {
+            this.state.PC = offset;
+        }
+    }
 };
