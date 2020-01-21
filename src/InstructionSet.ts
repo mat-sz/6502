@@ -1,6 +1,7 @@
 import { State } from '.';
 
 import ADC from './instructions/ADC';
+import ASL from './instructions/ASL';
 import AND from './instructions/AND';
 import BCC from './instructions/BCC';
 import BCS from './instructions/BCS';
@@ -97,9 +98,9 @@ const getAddress = (state: State, mode: AddressMode) => {
         case AddressMode.INDIRECT:
             return getWord(state, getImmediateWord(state));
         case AddressMode.INDIRECT_X:
-            return getWord(state, getImmediateWord(state) + state.X);
+            return getWord(state, (getImmediateByte(state) + state.X) & 0xFF);
         case AddressMode.INDIRECT_Y:
-            return getWord(state, getImmediateWord(state)) + state.Y;
+            return getWord(state, getImmediateByte(state)) + state.Y;
         case AddressMode.RELATIVE:
             let value = getImmediateByte(state);
             if (value >= 0x80) {
@@ -173,6 +174,11 @@ const createInstruction = (
         bytes: bytes,
         name: (fn as any).name ? (fn as any).name : 'XYZ',
         fn: (state: State) => {
+            state.A = state.A & 0xFF;
+            state.X = state.X & 0xFF;
+            state.Y = state.Y & 0xFF;
+            state.SP = state.SP & 0xFF;
+            
             const operand = useAddress ? getAddress(state, addressMode) : getOperand(state, addressMode);
             
             const result = fn(state, operand, (value: number) => setOperand(state, addressMode, value));
@@ -218,11 +224,11 @@ instructionSet[0xE1] = createInstruction(SBC, AddressMode.INDIRECT_X,  2);
 instructionSet[0xF1] = createInstruction(SBC, AddressMode.INDIRECT_Y,  2);
 
 // ASL - Arithmetic shift left
-instructionSet[0x0A] = createInstruction(AND, AddressMode.ACCUMULATOR, 1);
-instructionSet[0x06] = createInstruction(AND, AddressMode.ZEROPAGE,    2);
-instructionSet[0x16] = createInstruction(AND, AddressMode.ZEROPAGE_X,  2);
-instructionSet[0x0E] = createInstruction(AND, AddressMode.ABSOLUTE,    3);
-instructionSet[0x1E] = createInstruction(AND, AddressMode.ABSOLUTE_X,  3);
+instructionSet[0x0A] = createInstruction(ASL, AddressMode.ACCUMULATOR, 1);
+instructionSet[0x06] = createInstruction(ASL, AddressMode.ZEROPAGE,    2);
+instructionSet[0x16] = createInstruction(ASL, AddressMode.ZEROPAGE_X,  2);
+instructionSet[0x0E] = createInstruction(ASL, AddressMode.ABSOLUTE,    3);
+instructionSet[0x1E] = createInstruction(ASL, AddressMode.ABSOLUTE_X,  3);
 
 // LSR - Logical shift right
 instructionSet[0x4A] = createInstruction(LSR, AddressMode.ACCUMULATOR, 1);
@@ -508,5 +514,9 @@ export const performIRQ = (state: State, offset: number, brk = false) => {
     state.PC = getWord(state, offset);
     return state;
 };
+
+// Decimal Mode
+export const decodeBCD = (operand: number) => (operand >> 4) * 10 + (operand & 0x0F);
+export const encodeBCD = (value: number) => ((value / 10) << 4 + (value % 10)) & 0xFF;
 
 export default instructionSet;

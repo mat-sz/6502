@@ -70,10 +70,6 @@ export class CPU {
         } else {
             throw new Error('Unsupported opcode. ' + code.toString(16) + ' at ' + this.state.PC.toString(16));
         }
-        
-        if (this.state.DF) {
-            throw new Error('Decimal mode is not supported yet.');
-        }
     }
 
     /**
