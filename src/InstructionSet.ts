@@ -517,6 +517,6 @@ export const performIRQ = (state: State, offset: number, brk = false) => {
 
 // Decimal Mode
 export const decodeBCD = (operand: number) => (operand >> 4) * 10 + (operand & 0x0F);
-export const encodeBCD = (value: number) => ((value / 10) << 4 + (value % 10)) & 0xFF;
+export const encodeBCD = (value: number) => (Math.floor(value / 10) << 4) + (value % 10);
 
 export default instructionSet;

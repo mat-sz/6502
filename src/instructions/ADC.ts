@@ -8,7 +8,7 @@ export default function ADC (state: State, operand: number) {
         if (state.CF) value++;
     
         state.CF = (value > 99);
-        if (value > 100) value -= 100;
+        if (value > 99) value -= 100;
 
         state.ZF = value === 0;
         value = encodeBCD(value);
