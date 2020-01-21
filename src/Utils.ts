@@ -22,6 +22,7 @@ export type InstructionFunction = (state: State) => State;
 export interface Instruction {
     addressMode: AddressMode,
     bytes: number,
+    cycles: number,
     fn: InstructionFunction,
     name: string,
 };
@@ -110,11 +111,12 @@ const setOperand = (state: State, mode: AddressMode, value: number) => {
 
 export const createInstruction = (
     fn: (state: State, operand: number, setOperand: (value: number) => State) => State,
-    addressMode: AddressMode, bytes: number, useAddress = false) => {
+    addressMode: AddressMode, bytes: number, cycles: number, useAddress = false) => {
 
     return {
         addressMode: addressMode,
         bytes: bytes,
+        cycles: cycles,
         name: (fn as any).name ? (fn as any).name : 'XYZ',
         fn: (state: State) => {
             state.A = state.A & 0xFF;
@@ -126,6 +128,7 @@ export const createInstruction = (
             
             const result = fn(state, operand, (value: number) => setOperand(state, addressMode, value));
             result.PC += bytes;
+            result.cycles += cycles;
             
             return result;
         }

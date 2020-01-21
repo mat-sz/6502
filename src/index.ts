@@ -21,6 +21,9 @@ export interface State {
 
     NMI: boolean;
     IRQ: boolean;
+
+    cycles: number; // Count of cycles spent on an instruction,
+                    // is reset on step().
 };
 
 export class CPU {
@@ -43,6 +46,8 @@ export class CPU {
 
         NMI: false,
         IRQ: false,
+
+        cycles: 0,
     };
 
     constructor() {
@@ -71,6 +76,8 @@ export class CPU {
      * Executes next instruction.
      */
     step() {
+        this.state.cycles = 0;
+
         const code = this.state.memory[this.state.PC];
         if (code in instructionSet) {
             this.state = instructionSet[code].fn(this.state);
