@@ -6,7 +6,8 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "mocha -r ts-node/register test/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,10 @@
   "license": "BSD-3-Clause-Clear",
   "private": false,
   "devDependencies": {
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^13.1.8",
+    "mocha": "^7.0.0",
+    "ts-node": "^8.6.2",
     "typescript": "^3.7.4"
   }
 }
