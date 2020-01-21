@@ -1,5 +1,5 @@
 import { State } from '../';
-import { popByte } from '../InstructionSet';
+import { popByte } from '../Utils';
 
 export default function PLA (state: State, operand: number) {
     state.A = popByte(state);

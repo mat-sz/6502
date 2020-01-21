@@ -1,5 +1,5 @@
 import { State } from '../';
-import { setSR, popByte, popWord } from '../InstructionSet';
+import { setSR, popByte, popWord } from '../Utils';
 
 export default function RTI (state: State, operand: number) {
     state = setSR(state, popByte(state));

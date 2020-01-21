@@ -1,5 +1,5 @@
 import { State } from '../';
-import { decodeBCD, encodeBCD } from '../InstructionSet';
+import { decodeBCD, encodeBCD } from '../Utils';
 
 export default function ADC (state: State, operand: number) {
     let value = 0;

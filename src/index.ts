@@ -1,4 +1,4 @@
-import instructionSet from './InstructionSet';
+import instructionSet from './instructionSet';
 export const MEMORY_SIZE = 65536;
 
 export interface State {
