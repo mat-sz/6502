@@ -1,4 +1,5 @@
 import instructionSet from './instructionSet';
+import { performIRQ } from './Utils';
 export const MEMORY_SIZE = 65536;
 
 export interface State {
@@ -17,6 +18,9 @@ export interface State {
     CF: boolean; // Carry flag
 
     memory: Uint8Array; // Memory (at most 64KiB)
+
+    NMI: boolean;
+    IRQ: boolean;
 };
 
 export class CPU {
@@ -36,6 +40,9 @@ export class CPU {
         CF: false,
 
         memory: new Uint8Array(MEMORY_SIZE),
+
+        NMI: false,
+        IRQ: false,
     };
 
     constructor() {
@@ -69,6 +76,15 @@ export class CPU {
             this.state = instructionSet[code].fn(this.state);
         } else {
             throw new Error('Unsupported opcode. ' + code.toString(16) + ' at ' + this.state.PC.toString(16));
+        }
+
+        // Handle NMI and IRQ
+        if (this.state.NMI) {
+            performIRQ(this.state, 0xFFFA);
+            this.state.NMI = false;
+        } else if (!this.state.IF && this.state.IRQ) {
+            performIRQ(this.state, 0xFFFE);
+            this.state.NMI = false;
         }
     }
 
