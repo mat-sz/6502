@@ -79,6 +79,7 @@ export interface Instruction {
     addressMode: AddressMode,
     bytes: number,
     fn: InstructionFunction,
+    name: string,
 };
 
 const getWord = (state: State, offset: number) => ((state.memory[offset + 1] << 8 | state.memory[offset]) & 0xFFFF);
@@ -102,7 +103,7 @@ const getAddress = (state: State, mode: AddressMode) => {
         case AddressMode.RELATIVE:
             let value = getImmediateByte(state);
             if (value >= 0x80) {
-                value -= 0xff;
+                value -= 0x100;
             }
             
             return state.PC + value;
@@ -170,6 +171,7 @@ const createInstruction = (
     return {
         addressMode: addressMode,
         bytes: bytes,
+        name: (fn as any).name ? (fn as any).name : 'XYZ',
         fn: (state: State) => {
             const operand = useAddress ? getAddress(state, addressMode) : getOperand(state, addressMode);
             
@@ -417,7 +419,7 @@ instructionSet[0x99] = createInstruction(STA, AddressMode.ABSOLUTE_Y,  3);
 instructionSet[0x81] = createInstruction(STA, AddressMode.INDIRECT_X,  2);
 instructionSet[0x91] = createInstruction(STA, AddressMode.INDIRECT_Y,  2);
 
-// STA - Store X in memory
+// STX - Store X in memory
 instructionSet[0x86] = createInstruction(STX, AddressMode.ZEROPAGE,    2);
 instructionSet[0x96] = createInstruction(STX, AddressMode.ZEROPAGE_Y,  2);
 instructionSet[0x8E] = createInstruction(STX, AddressMode.ABSOLUTE,    3);
