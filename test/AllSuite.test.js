@@ -10,5 +10,5 @@ describe('AllSuite', () => {
         const state = cpu.execute(0x0400);
 
         assert.strictEqual(state.PC, 0x45c0);
-    });
+    }).timeout(10000);
 });

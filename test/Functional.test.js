@@ -11,5 +11,5 @@ describe('Functional', () => {
         const state = cpu.execute(0x0400);
 
         assert.strictEqual(state.PC, 0x3399);
-    });
+    }).timeout(10000);
 });
