@@ -2,53 +2,32 @@ import instructionSet from './instructionSet';
 import { performIRQ } from './Utils';
 export const MEMORY_SIZE = 65536;
 
-export interface State {
-    PC: number;
-    SP: number;
+export class State {
+    PC = 0; // Program counter
+    SP = 0; // Stack pointer
     
-    A: number;
-    X: number;
-    Y: number;
+    A = 0; // Accumulator
+    X = 0; // X index
+    Y = 0; // Y index
 
-    NF: boolean; // Negative flag
-    VF: boolean; // Overflow flag
-    DF: boolean; // Decimal flag
-    IF: boolean; // Interrupt flag
-    ZF: boolean; // Zero flag
-    CF: boolean; // Carry flag
+    NF = false; // Negative flag
+    VF = false; // Overflow flag
+    DF = false; // Decimal flag
+    IF = true;  // Interrupt flag
+    ZF = false; // Zero flag
+    CF = false; // Carry flag
 
-    memory: Uint8Array; // Memory (at most 64KiB)
+    memory = new Uint8Array(MEMORY_SIZE); // Memory (at most 64KiB)
 
-    NMI: boolean;
-    IRQ: boolean;
+    NMI = false;
+    IRQ = false;
 
-    cycles: number; // Count of cycles spent on an instruction,
-                    // is reset on step().
+    cycles= 0;  // Count of cycles spent on an instruction,
+                // is reset on step().
 };
 
 export class CPU {
-    private state: State = {
-        PC: 0,
-        SP: 0,
-
-        A: 0,
-        X: 0,
-        Y: 0,
-
-        NF: false,
-        VF: false,
-        DF: false,
-        IF: true,
-        ZF: false,
-        CF: false,
-
-        memory: new Uint8Array(MEMORY_SIZE),
-
-        NMI: false,
-        IRQ: false,
-
-        cycles: 0,
-    };
+    private state: State = new State();
 
     constructor() {
 
