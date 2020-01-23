@@ -25,24 +25,23 @@ export class State {
 };
 
 export const step = (state: State, getMemory: (offset: number) => number, setMemory: (offset: number, value: number) => void) => {
-    let newState = {...state};
-    newState.cycles = 0;
+    state.cycles = 0;
     
-    const code = getMemory(newState.PC);
+    const code = getMemory(state.PC);
     if (code in instructionSet) {
-        newState = instructionSet[code].fn(newState, getMemory, setMemory);
+        state = instructionSet[code].fn(state, getMemory, setMemory);
     } else {
-        throw new Error('Unsupported opcode. ' + code.toString(16) + ' at ' + newState.PC.toString(16));
+        throw new Error('Unsupported opcode. ' + code.toString(16) + ' at ' + state.PC.toString(16));
     }
 
     // Handle NMI and IRQ
-    if (newState.NMI) {
-        performIRQ(newState, getMemory, setMemory, 0xFFFA);
-        newState.NMI = false;
-    } else if (!newState.IF && newState.IRQ) {
-        performIRQ(newState, getMemory, setMemory, 0xFFFE);
-        newState.NMI = false;
+    if (state.NMI) {
+        performIRQ(state, getMemory, setMemory, 0xFFFA);
+        state.NMI = false;
+    } else if (!state.IF && state.IRQ) {
+        performIRQ(state, getMemory, setMemory, 0xFFFE);
+        state.NMI = false;
     }
 
-    return newState;
+    return state;
 };

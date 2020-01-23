@@ -13,14 +13,10 @@ describe('Functional', () => {
         state.PC = 0x0400;
         memory.set(new Uint8Array(binary), 0x0000);
 
-        let cycles = 0;
         while (state.PC != PC) {
             PC = state.PC;
             state = _6502.step(state, (offset) => memory[offset], (offset, value) => memory[offset] = value);
-            cycles += state.cycles;
         }
-
-        console.log(cycles);
 
         assert.strictEqual(state.PC, 0x3399);
     }).timeout(100000);
