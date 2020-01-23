@@ -24,6 +24,13 @@ export class State {
                 // is reset on step().
 };
 
+/**
+ * Executes next instruction.
+ * @param state CPU state to use.
+ * @param getMemory Function that returns a given byte for a given offset.
+ * @param setMemory Function that sets a byte for a given offset.
+ * @returns State
+ */
 export const step = (state: State, getMemory: (offset: number) => number, setMemory: (offset: number, value: number) => void) => {
     state.cycles = 0;
     
