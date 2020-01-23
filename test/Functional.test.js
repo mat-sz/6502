@@ -19,5 +19,5 @@ describe('Functional', () => {
         }
 
         assert.strictEqual(state.PC, 0x3399);
-    }).timeout(100000);
+    }).timeout(10000);
 });
