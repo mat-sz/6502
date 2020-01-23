@@ -1,6 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function INY (state: State, operand: number) {
+export default function INY (state: State, { operand }: InstructionProps) {
     state.Y++;
 
     state.ZF = (state.Y & 0xFF) === 0x00;

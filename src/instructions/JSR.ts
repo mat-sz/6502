@@ -1,8 +1,8 @@
 import { State } from '../';
-import { pushWord } from '../Utils';
+import { InstructionProps } from '../Utils';
 
-export default function JSR (state: State, operand: number) {
-    state = pushWord(state, state.PC + 2);
-    state.PC = operand;
+export default function JSR (state: State, { address, pushWord }: InstructionProps) {
+    pushWord(state.PC + 2);
+    state.PC = address;
     return state;
 };

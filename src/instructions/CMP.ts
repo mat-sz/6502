@@ -1,6 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function CMP (state: State, operand: number) {
+export default function CMP (state: State, { operand }: InstructionProps) {
     let value = state.A - operand;
 
     state.CF = state.A >= operand;

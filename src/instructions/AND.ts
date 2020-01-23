@@ -1,6 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function AND (state: State, operand: number) {
+export default function AND (state: State, { operand }: InstructionProps) {
     let value = (state.A & operand);
 
     state.ZF = (value & 0xFF) === 0x00;

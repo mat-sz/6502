@@ -1,6 +1,8 @@
 import { State } from '../';
-import { pushByte, getSR } from '../Utils';
+import { getSR } from '../Utils';
+import { InstructionProps } from '../Utils';
 
-export default function PHP (state: State, operand: number) {
-    return pushByte(state, getSR(state, true));
+export default function PHP (state: State, { pushByte }: InstructionProps) {
+    pushByte(getSR(state, true));
+    return state;
 };

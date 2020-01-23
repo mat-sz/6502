@@ -1,5 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function STX (state: State, operand: number, setOperand: (value: number) => State) {
-    return setOperand(state.X);
+export default function STX (state: State, { setOperand }: InstructionProps) {
+    setOperand(state.X);
+    return state;
 };

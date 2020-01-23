@@ -1,6 +1,6 @@
 import { State } from '../';
 
-export default function TAY (state: State, operand: number) {
+export default function TAY (state: State) {
     state.Y = state.A;
 
     state.ZF = (state.Y & 0xFF) === 0x00;

@@ -1,6 +1,7 @@
 import { State } from '../';
-import { pushByte } from '../Utils';
+import { InstructionProps } from '../Utils';
 
-export default function PHA (state: State, operand: number) {
-    return pushByte(state, state.A);
+export default function PHA (state: State, { pushByte }: InstructionProps) {
+    pushByte(state.A);
+    return state;
 };

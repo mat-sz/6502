@@ -1,6 +1,6 @@
 import { State } from '../';
 
-export default function TXA (state: State, operand: number) {
+export default function TXA (state: State) {
     state.A = state.X;
 
     state.ZF = (state.A & 0xFF) === 0x00;

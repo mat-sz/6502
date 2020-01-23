@@ -1,6 +1,6 @@
 import { State } from '../';
 
-export default function TSX (state: State, operand: number) {
+export default function TSX (state: State) {
     state.X = state.SP;
 
     state.ZF = (state.X & 0xFF) === 0x00;

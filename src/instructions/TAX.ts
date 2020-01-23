@@ -1,6 +1,6 @@
 import { State } from '../';
 
-export default function TAX (state: State, operand: number) {
+export default function TAX (state: State) {
     state.X = state.A;
 
     state.ZF = (state.X & 0xFF) === 0x00;

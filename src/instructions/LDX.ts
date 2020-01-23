@@ -1,6 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function LDX (state: State, operand: number) {
+export default function LDX (state: State, { operand }: InstructionProps) {
     state.X = operand;
 
     state.ZF = (state.X & 0xFF) === 0x00;

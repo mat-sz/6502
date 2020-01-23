@@ -1,6 +1,6 @@
 import { State } from '../';
 
-export default function CLV (state: State, operand: number) {
+export default function CLV (state: State) {
     state.VF = false;
     return state;
 };

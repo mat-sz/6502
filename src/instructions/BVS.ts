@@ -1,8 +1,9 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function BVS (state: State, operand: number) {
+export default function BVS (state: State, { address }: InstructionProps) {
     if (state.VF) {
-        state.PC = operand;
+        state.PC = address;
     }
 
     return state;

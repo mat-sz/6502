@@ -1,5 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function STA (state: State, operand: number, setOperand: (value: number) => State) {
-    return setOperand(state.A);
+export default function STA (state: State, { setOperand }: InstructionProps) {
+    setOperand(state.A);
+    return state;
 };

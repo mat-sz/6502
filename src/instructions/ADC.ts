@@ -1,7 +1,7 @@
 import { State } from '../';
-import { decodeBCD, encodeBCD } from '../Utils';
+import { decodeBCD, encodeBCD, InstructionProps } from '../Utils';
 
-export default function ADC (state: State, operand: number) {
+export default function ADC (state: State, { operand }: InstructionProps) {
     let value = 0;
     if (state.DF) {
         value = decodeBCD(state.A) + decodeBCD(operand);

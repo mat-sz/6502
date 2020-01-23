@@ -1,8 +1,9 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function BNE (state: State, operand: number) {
+export default function BNE (state: State, { address }: InstructionProps) {
     if (!state.ZF) {
-        state.PC = operand;
+        state.PC = address;
     }
 
     return state;

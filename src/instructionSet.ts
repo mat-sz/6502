@@ -120,28 +120,28 @@ instructionSet[0x6E] = createInstruction(ROR, AddressMode.ABSOLUTE,    3, 6);
 instructionSet[0x7E] = createInstruction(ROR, AddressMode.ABSOLUTE_X,  3, 7);
 
 // BCC - Branch on CF = 0
-instructionSet[0x90] = createInstruction(BCC, AddressMode.RELATIVE,    2, 2, true);
+instructionSet[0x90] = createInstruction(BCC, AddressMode.RELATIVE,    2, 2);
 
 // BCS - Branch on CF = 1
-instructionSet[0xB0] = createInstruction(BCS, AddressMode.RELATIVE,    2, 2, true);
+instructionSet[0xB0] = createInstruction(BCS, AddressMode.RELATIVE,    2, 2);
 
 // BEQ - Branch on ZF = 1
-instructionSet[0xF0] = createInstruction(BEQ, AddressMode.RELATIVE,    2, 2, true);
+instructionSet[0xF0] = createInstruction(BEQ, AddressMode.RELATIVE,    2, 2);
 
 // BMI - Branch on NF = 1
-instructionSet[0x30] = createInstruction(BMI, AddressMode.RELATIVE,    2, 2, true);
+instructionSet[0x30] = createInstruction(BMI, AddressMode.RELATIVE,    2, 2);
 
 // BNE - Branch on ZF = 0
-instructionSet[0xD0] = createInstruction(BNE, AddressMode.RELATIVE,    2, 2, true);
+instructionSet[0xD0] = createInstruction(BNE, AddressMode.RELATIVE,    2, 2);
 
 // BPL - Branch on NF = 0
-instructionSet[0x10] = createInstruction(BPL, AddressMode.RELATIVE,    2, 2, true);
+instructionSet[0x10] = createInstruction(BPL, AddressMode.RELATIVE,    2, 2);
 
 // BVC - Branch on VF = 0
-instructionSet[0x50] = createInstruction(BVC, AddressMode.RELATIVE,    2, 2, true);
+instructionSet[0x50] = createInstruction(BVC, AddressMode.RELATIVE,    2, 2);
 
 // BVS - Branch on VF = 1
-instructionSet[0x70] = createInstruction(BVS, AddressMode.RELATIVE,    2, 2, true);
+instructionSet[0x70] = createInstruction(BVS, AddressMode.RELATIVE,    2, 2);
 
 // BIT - Test bits in memory with A
 instructionSet[0x24] = createInstruction(BIT, AddressMode.ZEROPAGE,    2, 3);
@@ -236,11 +236,11 @@ instructionSet[0x01] = createInstruction(ORA, AddressMode.INDIRECT_X,  2, 6);
 instructionSet[0x11] = createInstruction(ORA, AddressMode.INDIRECT_Y,  2, 5);
 
 // JMP - Jump
-instructionSet[0x4C] = createInstruction(JMP, AddressMode.ABSOLUTE,    0, 3, true);
-instructionSet[0x6C] = createInstruction(JMP, AddressMode.INDIRECT,    0, 5, true);
+instructionSet[0x4C] = createInstruction(JMP, AddressMode.ABSOLUTE,    0, 3);
+instructionSet[0x6C] = createInstruction(JMP, AddressMode.INDIRECT,    0, 5);
 
 // JSR - Jump to subroutine
-instructionSet[0x20] = createInstruction(JSR, AddressMode.ABSOLUTE,    0, 6, true);
+instructionSet[0x20] = createInstruction(JSR, AddressMode.ABSOLUTE,    0, 6);
 
 // RTI - Return from interrupt
 instructionSet[0x40] = createInstruction(RTI, AddressMode.IMPLIED,     1, 6);

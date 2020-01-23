@@ -1,6 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function LDA (state: State, operand: number) {
+export default function LDA (state: State, { operand }: InstructionProps) {
     state.A = operand;
 
     state.ZF = (state.A & 0xFF) === 0x00;

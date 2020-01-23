@@ -1,7 +1,7 @@
 import { State } from '../';
-import { popWord } from '../Utils';
+import { InstructionProps } from '../Utils';
 
-export default function RTS (state: State, operand: number) {
-    state.PC = popWord(state);
+export default function RTS (state: State, { popWord }: InstructionProps) {
+    state.PC = popWord();
     return state;
 };

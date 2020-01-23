@@ -1,6 +1,6 @@
 import { State } from '../';
 
-export default function NOP (state: State, operand: number) {
+export default function NOP (state: State) {
     // :)
     return state;
 };

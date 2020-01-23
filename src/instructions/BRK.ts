@@ -1,8 +1,8 @@
 import { State } from '../';
-import { performIRQ } from '../Utils';
+import { InstructionProps } from '../Utils';
 
-export default function BRK (state: State, operand: number) {
+export default function BRK (state: State, { performIRQ }: InstructionProps) {
     state.PC += 2;
-    performIRQ(state, 0xFFFE, true);
+    performIRQ(0xFFFE, true);
     return state;
 };

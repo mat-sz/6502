@@ -1,6 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function DEX (state: State, operand: number) {
+export default function DEX (state: State, { operand }: InstructionProps) {
     state.X--;
 
     state.ZF = (state.X & 0xFF) === 0x00;

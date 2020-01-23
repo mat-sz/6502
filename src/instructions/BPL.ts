@@ -1,8 +1,9 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function BPL (state: State, operand: number) {
+export default function BPL (state: State, { address }: InstructionProps) {
     if (!state.NF) {
-        state.PC = operand;
+        state.PC = address;
     }
 
     return state;

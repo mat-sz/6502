@@ -1,6 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function CPY (state: State, operand: number) {
+export default function CPY (state: State, { operand }: InstructionProps) {
     let value = state.Y - operand;
 
     state.CF = state.Y >= operand;

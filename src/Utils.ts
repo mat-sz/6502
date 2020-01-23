@@ -16,8 +16,21 @@ export enum AddressMode {
     ZEROPAGE_Y,  // Operand is zeropage address incremented by Y without carry
 };
 
-// Pure functions for state changes to make debugging easier.
-export type InstructionFunction = (state: State) => State;
+export type InstructionFunction = (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction) => State;
+
+export type GetMemoryFunction = (offset: number) => number;
+export type SetMemoryFunction = (offset: number, value: number) => void;
+
+export interface InstructionProps {
+    address: number,
+    operand: number,
+    setOperand: (value: number) => void,
+    pushByte: (value: number) => void,
+    pushWord: (value: number) => void,
+    popByte: () => number,
+    popWord: () => number,
+    performIRQ: (offset: number, brk?: boolean) => void,
+};
 
 export interface Instruction {
     addressMode: AddressMode,
@@ -27,43 +40,44 @@ export interface Instruction {
     name: string,
 };
 
-const getWord = (state: State, offset: number) => ((state.memory[offset + 1] << 8 | state.memory[offset]) & 0xFFFF);
-const getImmediateWord = (state: State) => getWord(state, state.PC + 1);
-const getImmediateByte = (state: State) => state.memory[state.PC + 1];
+const getWord = (state: State, getMemory: GetMemoryFunction, offset: number) => ((getMemory(offset + 1) << 8 | getMemory(offset)) & 0xFFFF);
+const getImmediateWord = (state: State, getMemory: GetMemoryFunction) => getWord(state, getMemory, state.PC + 1);
+const getImmediateByte = (state: State, getMemory: GetMemoryFunction) => getMemory(state.PC + 1);
 
-const getAddress = (state: State, mode: AddressMode) => {
+const getAddress = (state: State, getMemory: GetMemoryFunction, mode: AddressMode) => {
     switch (mode) {
         case AddressMode.ABSOLUTE:
-            return getImmediateWord(state);
+            return getImmediateWord(state, getMemory);
         case AddressMode.ABSOLUTE_X:
-            return getImmediateWord(state) + state.X;
+            return getImmediateWord(state, getMemory) + state.X;
         case AddressMode.ABSOLUTE_Y:
-            return getImmediateWord(state) + state.Y;
+            return getImmediateWord(state, getMemory) + state.Y;
         case AddressMode.INDIRECT:
-            return getWord(state, getImmediateWord(state));
+            return getWord(state, getMemory, getImmediateWord(state, getMemory));
         case AddressMode.INDIRECT_X:
-            return getWord(state, (getImmediateByte(state) + state.X) & 0xFF);
+            return getWord(state, getMemory, (getImmediateByte(state, getMemory) + state.X) & 0xFF);
         case AddressMode.INDIRECT_Y:
-            return getWord(state, getImmediateByte(state)) + state.Y;
+            return getWord(state, getMemory, getImmediateByte(state, getMemory)) + state.Y;
         case AddressMode.RELATIVE:
-            let value = getImmediateByte(state);
+            let value = getImmediateByte(state, getMemory);
             if (value >= 0x80) {
                 value -= 0x100;
             }
             
             return state.PC + value;
         case AddressMode.ZEROPAGE:
-            return getImmediateByte(state);
+            return getImmediateByte(state, getMemory);
         case AddressMode.ZEROPAGE_X:
-            return (getImmediateByte(state) + state.X) & 0xff;
+            return (getImmediateByte(state, getMemory) + state.X) & 0xff;
         case AddressMode.ZEROPAGE_Y:
-            return (getImmediateByte(state) + state.Y) & 0xff;
+            return (getImmediateByte(state, getMemory) + state.Y) & 0xff;
         default:
-            throw new Error('Incorrect address mode');
+            // TODO: Return null instead (or fix createInstruction).
+            return 0;
     }
 };
 
-const getOperand = (state: State, mode: AddressMode) => {
+const getOperand = (state: State, getMemory: GetMemoryFunction, mode: AddressMode) => {
     switch (mode) {
         case AddressMode.ACCUMULATOR:
             return state.A;
@@ -77,17 +91,18 @@ const getOperand = (state: State, mode: AddressMode) => {
         case AddressMode.ZEROPAGE:
         case AddressMode.ZEROPAGE_X:
         case AddressMode.ZEROPAGE_Y:
-            return state.memory[getAddress(state, mode)];
+            return getMemory(getAddress(state, getMemory, mode));
         case AddressMode.IMMEDIATE:
-            return getImmediateByte(state);
+            return getImmediateByte(state, getMemory);
         case AddressMode.IMPLIED:
             return 0;
         default:
-            throw new Error('Incorrect address mode');
+            // TODO: Return null instead (or fix createInstruction).
+            return 0;
     }
 };
 
-const setOperand = (state: State, mode: AddressMode, value: number) => {
+const setOperand = (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction, mode: AddressMode, value: number) => {
     switch (mode) {
         case AddressMode.ACCUMULATOR:
             state.A = value;
@@ -100,7 +115,7 @@ const setOperand = (state: State, mode: AddressMode, value: number) => {
         case AddressMode.ZEROPAGE:
         case AddressMode.ZEROPAGE_X:
         case AddressMode.ZEROPAGE_Y:
-            state.memory[getAddress(state, mode)] = value;
+            setMemory(getAddress(state, getMemory, mode), value);
             break;
         default:
             throw new Error('Incorrect address mode');
@@ -110,23 +125,30 @@ const setOperand = (state: State, mode: AddressMode, value: number) => {
 };
 
 export const createInstruction = (
-    fn: (state: State, operand: number, setOperand: (value: number) => State) => State,
-    addressMode: AddressMode, bytes: number, cycles: number, useAddress = false) => {
+    fn: ((state: State, props: InstructionProps) => State) | ((state: State) => State),
+    addressMode: AddressMode, bytes: number, cycles: number) => {
 
     return {
         addressMode: addressMode,
         bytes: bytes,
         cycles: cycles,
         name: (fn as any).name ? (fn as any).name : 'XYZ',
-        fn: (state: State) => {
+        fn: (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction) => {
             state.A = state.A & 0xFF;
             state.X = state.X & 0xFF;
             state.Y = state.Y & 0xFF;
             state.SP = state.SP & 0xFF;
             
-            const operand = useAddress ? getAddress(state, addressMode) : getOperand(state, addressMode);
-            
-            const result = fn(state, operand, (value: number) => setOperand(state, addressMode, value));
+            const result = fn(state, {
+                address: getAddress(state, getMemory, addressMode),
+                operand: getOperand(state, getMemory, addressMode),
+                setOperand: (value: number) => setOperand(state, getMemory, setMemory, addressMode, value),
+                pushByte: (value: number) => pushByte(state, setMemory, value),
+                pushWord: (value: number) => pushWord(state, setMemory, value),
+                popByte: () => popByte(state, getMemory),
+                popWord: () => popWord(state, getMemory),
+                performIRQ: (offset: number, brk = false) => performIRQ(state, getMemory, setMemory, offset, brk),
+            });
             result.PC += bytes;
             result.cycles += cycles;
             
@@ -162,35 +184,35 @@ export const setSR = (state: State, value: number) => {
 };
 
 // Stack management
-export const pushByte = (state: State, value: number) => {
-    state.memory[0x0100 | state.SP] = value;
+export const pushByte = (state: State, setMemory: SetMemoryFunction, value: number) => {
+    setMemory(0x0100 | state.SP, value);
     state.SP--;
     return state;
 };
 
-export const pushWord = (state: State, value: number) => {
-    state.memory[0x0100 | state.SP] = value >> 8;
-    state.memory[0x0100 | (state.SP - 1)] = value & 0xff;
+export const pushWord = (state: State, setMemory: SetMemoryFunction, value: number) => {
+    setMemory(0x0100 | state.SP, value >> 8);
+    setMemory(0x0100 | (state.SP - 1), value & 0xff);
     state.SP -= 2;
     return state;
 };
 
-export const popByte = (state: State) => {
+export const popByte = (state: State, getMemory: GetMemoryFunction) => {
     state.SP++;
-    return state.memory[0x0100 | state.SP];
+    return getMemory(0x0100 | state.SP);
 };
 
-export const popWord = (state: State) => {
+export const popWord = (state: State, getMemory: GetMemoryFunction) => {
     state.SP += 2;
-    return (state.memory[0x0100 | state.SP] << 8) | (state.memory[0x0100 | (state.SP - 1)] & 0xFFFF);
+    return (getMemory(0x0100 | state.SP) << 8) | (getMemory(0x0100 | (state.SP - 1)) & 0xFFFF);
 };
 
 // IRQ
-export const performIRQ = (state: State, offset: number, brk = false) => {
-    pushWord(state, state.PC);
-    pushByte(state, getSR(state, brk));
+export const performIRQ = (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction, offset: number, brk = false) => {
+    pushWord(state, setMemory, state.PC);
+    pushByte(state, setMemory, getSR(state, brk));
     state.IF = true;
-    state.PC = getWord(state, offset);
+    state.PC = getWord(state, getMemory, offset);
     return state;
 };
 

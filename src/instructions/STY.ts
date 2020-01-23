@@ -1,5 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function STY (state: State, operand: number, setOperand: (value: number) => State) {
-    return setOperand(state.Y);
+export default function STY (state: State, { setOperand }: InstructionProps) {
+    setOperand(state.Y);
+    return state;
 };

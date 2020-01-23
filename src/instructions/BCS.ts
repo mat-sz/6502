@@ -1,8 +1,9 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function BCS (state: State, operand: number) {
+export default function BCS (state: State, { address }: InstructionProps) {
     if (state.CF) {
-        state.PC = operand;
+        state.PC = address;
     }
 
     return state;

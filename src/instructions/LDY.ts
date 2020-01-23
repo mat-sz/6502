@@ -1,6 +1,7 @@
 import { State } from '../';
+import { InstructionProps } from '../Utils';
 
-export default function LDY (state: State, operand: number) {
+export default function LDY (state: State, { operand }: InstructionProps) {
     state.Y = operand;
 
     state.ZF = (state.Y & 0xFF) === 0x00;

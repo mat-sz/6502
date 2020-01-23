@@ -1,6 +1,7 @@
 import { State } from '../';
-import { popByte, setSR } from '../Utils';
+import { setSR } from '../Utils';
+import { InstructionProps } from '../Utils';
 
-export default function PLP (state: State, operand: number) {
-    return setSR(state, popByte(state));
+export default function PLP (state: State, { popByte }: InstructionProps) {
+    return setSR(state, popByte());
 };
