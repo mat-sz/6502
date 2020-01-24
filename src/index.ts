@@ -1,5 +1,5 @@
 import instructionSet from './instructionSet';
-import { performIRQ } from './Utils';
+import { pushWord, pushByte, getSR, getWord, GetMemoryFunction, SetMemoryFunction } from './Utils';
 export const MEMORY_SIZE = 65536;
 
 export class State {
@@ -31,7 +31,7 @@ export class State {
  * @param setMemory Function that sets a byte for a given offset.
  * @returns State
  */
-export const step = (state: State, getMemory: (offset: number) => number, setMemory: (offset: number, value: number) => void) => {
+export const step = (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction) => {
     state.cycles = 0;
     
     const code = getMemory(state.PC);
@@ -47,8 +47,24 @@ export const step = (state: State, getMemory: (offset: number) => number, setMem
         state.NMI = false;
     } else if (!state.IF && state.IRQ) {
         performIRQ(state, getMemory, setMemory, 0xFFFE);
-        state.NMI = false;
+        state.IRQ = false;
     }
 
+    return state;
+};
+
+/**
+ * Performs an interrupt.
+ * @param state CPU state to use.
+ * @param getMemory Function that returns a given byte for a given offset.
+ * @param setMemory Function that sets a byte for a given offset.
+ * @param offset Reset vector
+ * @param brk Is a BRK
+ */
+export const performIRQ = (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction, offset: number, brk = false) => {
+    pushWord(state, setMemory, state.PC);
+    pushByte(state, setMemory, getSR(state, brk));
+    state.IF = true;
+    state.PC = getWord(state, getMemory, offset);
     return state;
 };

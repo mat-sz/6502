@@ -1,4 +1,4 @@
-import { State } from '.';
+import { State, performIRQ } from '.';
 
 export enum AddressMode {
     ACCUMULATOR, // Operand is A
@@ -40,7 +40,7 @@ export interface Instruction {
     name: string,
 };
 
-const getWord = (state: State, getMemory: GetMemoryFunction, offset: number) => ((getMemory(offset + 1) << 8 | getMemory(offset)) & 0xFFFF);
+export const getWord = (state: State, getMemory: GetMemoryFunction, offset: number) => ((getMemory(offset + 1) << 8 | getMemory(offset)) & 0xFFFF);
 const getImmediateWord = (state: State, getMemory: GetMemoryFunction) => getWord(state, getMemory, state.PC + 1);
 const getImmediateByte = (state: State, getMemory: GetMemoryFunction) => getMemory(state.PC + 1);
 
@@ -205,15 +205,6 @@ export const popByte = (state: State, getMemory: GetMemoryFunction) => {
 export const popWord = (state: State, getMemory: GetMemoryFunction) => {
     state.SP += 2;
     return (getMemory(0x0100 | state.SP) << 8) | (getMemory(0x0100 | (state.SP - 1)) & 0xFFFF);
-};
-
-// IRQ
-export const performIRQ = (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction, offset: number, brk = false) => {
-    pushWord(state, setMemory, state.PC);
-    pushByte(state, setMemory, getSR(state, brk));
-    state.IF = true;
-    state.PC = getWord(state, getMemory, offset);
-    return state;
 };
 
 // Decimal Mode

@@ -34,6 +34,7 @@ export interface Instruction {
     fn: InstructionFunction;
     name: string;
 }
+export declare const getWord: (state: State, getMemory: GetMemoryFunction, offset: number) => number;
 export declare const createInstruction: (fn: ((state: State, props: InstructionProps) => State) | ((state: State) => State), addressMode: AddressMode, bytes: number, cycles: number) => Instruction;
 export declare const getSR: (state: State, brk?: boolean) => number;
 export declare const setSR: (state: State, value: number) => State;
@@ -41,6 +42,5 @@ export declare const pushByte: (state: State, setMemory: SetMemoryFunction, valu
 export declare const pushWord: (state: State, setMemory: SetMemoryFunction, value: number) => State;
 export declare const popByte: (state: State, getMemory: GetMemoryFunction) => number;
 export declare const popWord: (state: State, getMemory: GetMemoryFunction) => number;
-export declare const performIRQ: (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction, offset: number, brk?: boolean) => State;
 export declare const decodeBCD: (operand: number) => number;
 export declare const encodeBCD: (value: number) => number;
