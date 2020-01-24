@@ -6,6 +6,22 @@ MOS Technology 6502 8-bit CPU emulator written in TypeScript.
 
 Passes common test suites (AllSuiteA and 6502_functional_test).
 
+## Installation
+
+For some reason publishing a package called "6502" to NPM is not possible.
+
+Because of this I include a transpiled version in the repo that will allow everyone to install the package with the following command:
+
+```
+yarn add mat-sz/6502
+```
+
+or, if you use npm:
+
+```
+npm install mat-sz/6502
+```
+
 ## Usage
 
 ```js
