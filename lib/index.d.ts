@@ -34,3 +34,10 @@ export declare const step: (state: State, getMemory: GetMemoryFunction, setMemor
  * @param push Should push PC and SR?
  */
 export declare const performIRQ: (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction, offset: number, brk?: boolean, push?: boolean) => State;
+/**
+ * Performs a reset.
+ * @param state CPU state to use.
+ * @param getMemory Function that returns a given byte for a given offset.
+ * @param setMemory Function that sets a byte for a given offset.
+ */
+export declare const performReset: (getMemory: GetMemoryFunction) => State;

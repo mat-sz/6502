@@ -67,8 +67,20 @@ export const performIRQ = (state: State, getMemory: GetMemoryFunction, setMemory
         pushWord(state, setMemory, state.PC);
         pushByte(state, setMemory, getSR(state, brk));
     }
-    
+
     state.IF = true;
     state.PC = getWord(state, getMemory, offset);
+    return state;
+};
+
+/**
+ * Performs a reset.
+ * @param state CPU state to use.
+ * @param getMemory Function that returns a given byte for a given offset.
+ * @param setMemory Function that sets a byte for a given offset.
+ */
+export const performReset = (getMemory: GetMemoryFunction) => {
+    let state = performIRQ(new State(), getMemory, (_: number) => 0, 0xFFFC, false, false);
+    state.SP = 0xFD;
     return state;
 };
