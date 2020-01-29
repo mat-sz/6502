@@ -60,10 +60,14 @@ export const step = (state: State, getMemory: GetMemoryFunction, setMemory: SetM
  * @param setMemory Function that sets a byte for a given offset.
  * @param offset Reset vector
  * @param brk Is a BRK
+ * @param push Should push PC and SR?
  */
-export const performIRQ = (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction, offset: number, brk = false) => {
-    pushWord(state, setMemory, state.PC);
-    pushByte(state, setMemory, getSR(state, brk));
+export const performIRQ = (state: State, getMemory: GetMemoryFunction, setMemory: SetMemoryFunction, offset: number, brk = false, push = true) => {
+    if (push) {
+        pushWord(state, setMemory, state.PC);
+        pushByte(state, setMemory, getSR(state, brk));
+    }
+    
     state.IF = true;
     state.PC = getWord(state, getMemory, offset);
     return state;
